@@ -1,4 +1,4 @@
-package com.example.kakeibo_dev_7.ui.theme
+package com.example.kakeibo_dev_7.presentation.component.theme
 
 import androidx.compose.ui.graphics.Color
 
