@@ -1,5 +1,4 @@
 package com.example.kakeibo_dev_7.presentation.ui.theme
-
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)
