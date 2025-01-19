@@ -47,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.kakeibo_dev_7.common.IncomeExpenditureColor
 import com.example.kakeibo_dev_7.common.IncomeExpenditureStatus
+import com.example.kakeibo_dev_7.presentation.NavigationViewModel
 import com.example.kakeibo_dev_7.presentation.components.layouts.Default
 import java.text.SimpleDateFormat
 import java.time.Instant
@@ -57,12 +58,13 @@ import java.util.Locale
 @Composable
 fun AddIncomeExpenditureScreen(
     navController: NavController,
+    navigationViewModel: NavigationViewModel,
     viewModel: AddIncomeExpenditureViewModel = hiltViewModel()
 ) {
 
     val selectOptionText = remember { mutableStateOf("カテゴリーを選択してください") }
 
-    Default(navController = navController) { paddingValues ->
+    Default(navController = navController, viewModel = navigationViewModel) { paddingValues ->
 
         Column(modifier = Modifier.padding(paddingValues)) {
             Row(

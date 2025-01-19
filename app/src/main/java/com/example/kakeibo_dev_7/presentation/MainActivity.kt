@@ -12,11 +12,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.room.Room
-import com.example.kakeibo_dev_7.data.AppDataBase
-import com.example.kakeibo_dev_7.domain.model.User
-import com.example.kakeibo_dev_7.domain.repository.UserDao
 import com.example.kakeibo_dev_7.presentation.add_income_expenditure.AddIncomeExpenditureScreen
+import com.example.kakeibo_dev_7.presentation.expenditure_report_screen.ExpenditureReportScreen
+import com.example.kakeibo_dev_7.presentation.income_report_screen.IncomeReportScreen
 import com.example.kakeibo_dev_7.presentation.ui.theme.Kakeibo_dev_7Theme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -39,13 +37,27 @@ class MainActivity : ComponentActivity() {
 
                     val navController = rememberNavController()
 
+                    val navigationViewModel: NavigationViewModel = hiltViewModel()
+
                     NavHost(
                         navController = navController,
                         startDestination = ScreenRoute.AddIncomeExpenditureScreen.route
                     ) {
 
                         composable(route = ScreenRoute.AddIncomeExpenditureScreen.route) {
-                            AddIncomeExpenditureScreen(navController = navController)
+                            AddIncomeExpenditureScreen(navController = navController, navigationViewModel = navigationViewModel)
+                        }
+
+                        composable(route = ScreenRoute.ExpenditureReportScreen.route) {
+                            ExpenditureReportScreen(navController = navController, navigationViewModel = navigationViewModel)
+                        }
+
+                        composable(route = ScreenRoute.IncomeReportScreen.route) {
+                            IncomeReportScreen(navController = navController, navigationViewModel = navigationViewModel)
+                        }
+
+                        composable(route = ScreenRoute.TransactionMoneyReportScreen.route) {
+                            TransactionMoneyReportScreen(navController = navController, navigationViewModel = navigationViewModel)
                         }
                     }
                 }
