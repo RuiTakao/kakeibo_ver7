@@ -34,13 +34,18 @@ import com.example.kakeibo_dev_7.common.IncomeExpenditureColor
 import com.example.kakeibo_dev_7.common.IncomeExpenditureStatus
 import com.example.kakeibo_dev_7.domain.model.TransactionMoney
 import com.example.kakeibo_dev_7.domain.model.TransactionMoneyReport
+import com.example.kakeibo_dev_7.domain.model.TransactionMoneyReportUseCase
 import com.example.kakeibo_dev_7.presentation.components.layouts.Default
 
 @Composable
 fun TransactionMoneyReportScreen(
     navController: NavController,
+    viewModel: TransactionMoneyReportViewModel = hiltViewModel(),
     navigationViewModel: NavigationViewModel
 ) {
+
+    viewModel.get()
+
 
     val transactionMoneyReportList: List<TransactionMoneyReport> = useCase()
 
@@ -213,7 +218,7 @@ fun useCase(): List<TransactionMoneyReport> {
 @Preview
 @Composable
 fun TransactionMoneyReportScreenPreview() {
-    val navController = rememberNavController()
-    val navigationViewModel: NavigationViewModel = hiltViewModel()
-    TransactionMoneyReportScreen(navController, navigationViewModel)
+//    val navController = rememberNavController()
+//    val navigationViewModel: NavigationViewModel = hiltViewModel()
+//    TransactionMoneyReportScreen(navController, navigationViewModel)
 }

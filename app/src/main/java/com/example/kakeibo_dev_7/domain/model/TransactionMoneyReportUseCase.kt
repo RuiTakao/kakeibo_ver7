@@ -3,6 +3,10 @@ package com.example.kakeibo_dev_7.domain.model
 import com.example.kakeibo_dev_7.common.IncomeExpenditureStatus
 
 class TransactionMoneyReportUseCase {
+
+    operator fun invoke() {
+        println("hello world")
+    }
     fun use_case(): List<TransactionMoneyReport> {
         val mock1 = TransactionMoney(
             id = 1,

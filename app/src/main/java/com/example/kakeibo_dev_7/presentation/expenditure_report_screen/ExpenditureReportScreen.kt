@@ -131,14 +131,14 @@ fun ExpenditureReportScreen(
                 ) {
 
                     val mock1 = ExpenditureReport(
-                        id = 1,
+                        id = "1",
                         categoryName = "🍙 食費",
                         paymentCount = 3,
                         paymentPriceSum = 5000
                     )
 
                     val mock2 = ExpenditureReport(
-                        id = 2,
+                        id = "2",
                         categoryName = "🛍 生活費",
                         paymentCount = 1,
                         paymentPriceSum = 5000

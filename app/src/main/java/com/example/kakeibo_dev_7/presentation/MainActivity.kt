@@ -16,6 +16,7 @@ import com.example.kakeibo_dev_7.presentation.add_income_expenditure.AddIncomeEx
 import com.example.kakeibo_dev_7.presentation.expenditure_report_screen.ExpenditureReportScreen
 import com.example.kakeibo_dev_7.presentation.income_report_screen.IncomeReportScreen
 import com.example.kakeibo_dev_7.presentation.ui.theme.Kakeibo_dev_7Theme
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -23,10 +24,20 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            if (!AppLaunchChecker.hasStartedFromLauncher(applicationContext)) {
-                val viewModel : CreateUserViewModel = hiltViewModel()
-                viewModel.createUser()
-            }
+//            val viewModel : CreateUserViewModel = hiltViewModel()
+//            viewModel.createUser()
+//            if (!AppLaunchChecker.hasStartedFromLauncher(applicationContext)) {
+//                val viewModel : CreateUserViewModel = hiltViewModel()
+//                viewModel.createUser()
+//            }
+            val data = hashMapOf(
+                "name" to "11111"
+            )
+
+            val db = FirebaseFirestore.getInstance()
+
+            db.collection("users")
+                .add(data)
 
             Kakeibo_dev_7Theme {
                 // A surface container using the 'background' color from the theme

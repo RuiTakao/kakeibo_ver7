@@ -1,5 +1,6 @@
 package com.example.kakeibo_dev_7.presentation.add_income_expenditure
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,6 +29,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,6 +63,10 @@ fun AddIncomeExpenditureScreen(
     navigationViewModel: NavigationViewModel,
     viewModel: AddIncomeExpenditureViewModel = hiltViewModel()
 ) {
+
+    val incomeExpenditure by viewModel.incomeExpenditure.collectAsState()
+
+    Log.d("w", incomeExpenditure.toString())
 
     val selectOptionText = remember { mutableStateOf("カテゴリーを選択してください") }
 
