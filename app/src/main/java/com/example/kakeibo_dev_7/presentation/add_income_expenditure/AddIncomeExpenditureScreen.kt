@@ -49,11 +49,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.kakeibo_dev_7.common.IncomeExpenditureColor
 import com.example.kakeibo_dev_7.common.IncomeExpenditureStatus
+import com.example.kakeibo_dev_7.domain.model.Category
 import com.example.kakeibo_dev_7.presentation.NavigationViewModel
 import com.example.kakeibo_dev_7.presentation.components.layouts.Default
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
@@ -65,8 +72,6 @@ fun AddIncomeExpenditureScreen(
 ) {
 
     val incomeExpenditure by viewModel.incomeExpenditure.collectAsState()
-
-    Log.d("w", incomeExpenditure.toString())
 
     val selectOptionText = remember { mutableStateOf("カテゴリーを選択してください") }
 
@@ -157,34 +162,21 @@ fun AddIncomeExpenditureScreen(
                 Column {
 
                     // 日付
-                    InputDateField()
+                    InputDateField(viewModel)
 
                     // 支出・収入
                     val label = when (viewModel.incomeExpenditureStatus.value) {
                         IncomeExpenditureStatus.Income -> "収入"
                         IncomeExpenditureStatus.Expenditure -> "支出"
                     }
-                    InputPayField(label = label)
+                    InputPayField(label = label, viewModel = viewModel)
 
                     // カテゴリー
-                    val categoryList: Map<Int, String> =
-                        when (viewModel.incomeExpenditureStatus.value) {
-                            IncomeExpenditureStatus.Income -> mapOf(
-                                1 to "本業",
-                                2 to "副業"
-                            )
-
-                            IncomeExpenditureStatus.Expenditure -> mapOf(
-                                1 to "🍙 食費",
-                                2 to "🛍 生活費",
-                                3 to "🚉 交通費"
-                            )
-                        }
-
-                    InputCategoryField(categoryList, selectOptionText)
+                    val categories by viewModel.category.collectAsState()
+                    InputCategoryField(categories, selectOptionText, viewModel)
 
                     // 内容
-                    InputContentField()
+                    InputContentField(viewModel)
                 }
 
                 Row(
@@ -205,7 +197,9 @@ fun AddIncomeExpenditureScreen(
                     )
 
                     TextButton(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            viewModel.create()
+                        },
                         modifier = Modifier
                             .background(
                                 color = buttonColor,
@@ -242,7 +236,7 @@ fun AddIncomeExpenditureScreen(
 }
 
 @Composable
-fun InputContentField() {
+fun InputContentField(viewModel: AddIncomeExpenditureViewModel) {
 
     var text by remember { mutableStateOf("") }
 
@@ -258,7 +252,10 @@ fun InputContentField() {
         )
         BasicTextField(
             value = text,
-            onValueChange = { text = it },
+            onValueChange = {
+                text = it
+                viewModel.content = it
+            },
             decorationBox = { innerTextField ->
                 Box(
                     contentAlignment = Alignment.CenterStart,
@@ -286,7 +283,7 @@ fun InputContentField() {
 }
 
 @Composable
-fun InputPayField(label: String) {
+fun InputPayField(label: String, viewModel: AddIncomeExpenditureViewModel) {
 
     var text by remember { mutableStateOf("") }
 
@@ -302,7 +299,10 @@ fun InputPayField(label: String) {
         )
         BasicTextField(
             value = text,
-            onValueChange = { text = it },
+            onValueChange = {
+                text = it
+                viewModel.price = it
+            },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             decorationBox = { innerTextField ->
                 Box(
@@ -331,7 +331,7 @@ fun InputPayField(label: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputDateField() {
+fun InputDateField(viewModel: AddIncomeExpenditureViewModel) {
 
     var visible by remember { mutableStateOf(false) }
     val yMd = SimpleDateFormat("y年M月d日", Locale.JAPANESE)
@@ -371,6 +371,13 @@ fun InputDateField() {
         }
 
         if (visible) {
+
+            val setState = viewModel.payDate.let { viewModel.payDate.toDate() } ?: Date()
+            val state = rememberDatePickerState(setState.time)
+            val getDate = state.selectedDateMillis?.let {
+                Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
+            }
+
             DatePickerDialog(
                 onDismissRequest = { visible = false },
                 confirmButton = {
@@ -383,9 +390,23 @@ fun InputDateField() {
                             onClick = {
                                 visible = false
 
-                                setState = Date.from(
-                                    getDate?.atStartOfDay(ZoneId.systemDefault())?.toInstant()
-                                )
+                                // 選択した日付をViewModelに保存
+                                viewModel.payDate =
+                                    getDate?.let {
+                                        getDate.format(
+                                            DateTimeFormatter.ofPattern("yyyy-MM-dd 12:00:00")
+                                        )
+                                    }
+                                        ?: if (viewModel.payDate == "") {
+                                            LocalDate.now()
+                                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd 12:00:00"))
+                                        } else {
+                                            val localDate = LocalDate.parse(
+                                                viewModel.payDate,
+                                                DateTimeFormatter.ofPattern("yyyy-MM-dd 12:00:00")
+                                            )
+                                            localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd 12:00:00"))
+                                        }
                             },
                             content = { Text(text = "OK") }
                         )
@@ -405,7 +426,11 @@ fun InputDateField() {
 }
 
 @Composable
-fun InputCategoryField(categoryList: Map<Int, String>, selectOptionText: MutableState<String>) {
+fun InputCategoryField(
+    categoryList: List<Category>,
+    selectOptionText: MutableState<String>,
+    viewModel: AddIncomeExpenditureViewModel
+) {
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -444,12 +469,14 @@ fun InputCategoryField(categoryList: Map<Int, String>, selectOptionText: Mutable
                 categoryList.forEach {
                     DropdownMenuItem(
                         text = {
-                            Text(text = it.value)
+                            Text(text = it.name)
                         },
                         onClick = {
                             expanded = false
 
-                            selectOptionText.value = it.value
+                            selectOptionText.value = it.name
+
+                            viewModel.categoryId = it.id
                         }
                     )
                     // 区切り線
@@ -470,4 +497,20 @@ fun InputCategoryField(categoryList: Map<Int, String>, selectOptionText: Mutable
             .height(1.dp)
             .background(Color.Black)
     )
+}
+
+fun String.toDate(pattern: String = "yyyy-MM-dd HH:mm:ss"): Date? {
+    val format = try {
+        SimpleDateFormat(pattern, Locale.JAPANESE)
+    } catch (e: IllegalArgumentException) {
+        null
+    }
+    val date = format?.let {
+        try {
+            it.parse(this)
+        } catch (e: ParseException) {
+            null
+        }
+    }
+    return date
 }

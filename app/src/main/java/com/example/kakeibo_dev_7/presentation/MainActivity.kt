@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.kakeibo_dev_7.presentation.add_income_expenditure.AddIncomeExpenditureScreen
 import com.example.kakeibo_dev_7.presentation.expenditure_report_screen.ExpenditureReportScreen
+import com.example.kakeibo_dev_7.presentation.expenditure_report_screen.ExpenditureReportViewModel
 import com.example.kakeibo_dev_7.presentation.income_report_screen.IncomeReportScreen
 import com.example.kakeibo_dev_7.presentation.ui.theme.Kakeibo_dev_7Theme
 import com.google.firebase.firestore.FirebaseFirestore
@@ -60,7 +61,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(route = ScreenRoute.ExpenditureReportScreen.route) {
-                            ExpenditureReportScreen(navController = navController, navigationViewModel = navigationViewModel)
+                            ExpenditureReportScreen(navController = navController, viewModel = ExpenditureReportViewModel(), navigationViewModel = navigationViewModel)
                         }
 
                         composable(route = ScreenRoute.IncomeReportScreen.route) {

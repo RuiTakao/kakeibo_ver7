@@ -1,5 +1,6 @@
 package com.example.kakeibo_dev_7.presentation.expenditure_report_screen
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,8 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -36,8 +39,11 @@ import com.example.kakeibo_dev_7.presentation.components.layouts.Default
 @Composable
 fun ExpenditureReportScreen(
     navController: NavController,
+    viewModel: ExpenditureReportViewModel,
     navigationViewModel: NavigationViewModel
 ) {
+
+    val expenditureReport by viewModel.expenditureReport.collectAsState()
 
     Default(navController = navController, viewModel = navigationViewModel) { paddingValues ->
 
@@ -130,24 +136,8 @@ fun ExpenditureReportScreen(
                     modifier = Modifier.padding(top = 16.dp)
                 ) {
 
-                    val mock1 = ExpenditureReport(
-                        id = "1",
-                        categoryName = "🍙 食費",
-                        paymentCount = 3,
-                        paymentPriceSum = 5000
-                    )
-
-                    val mock2 = ExpenditureReport(
-                        id = "2",
-                        categoryName = "🛍 生活費",
-                        paymentCount = 1,
-                        paymentPriceSum = 5000
-                    )
-
-                    val expenditureReportList: List<ExpenditureReport> = listOf(mock1, mock2)
-
                     LazyColumn {
-                        itemsIndexed(expenditureReportList) { index, report ->
+                        itemsIndexed(expenditureReport) { index, report ->
                             Row(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically,
